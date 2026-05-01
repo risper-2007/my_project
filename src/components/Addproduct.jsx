@@ -1,7 +1,6 @@
 import axios from 'axios'
 import React from 'react'
 import {useState} from 'react'
-import { Link } from 'react-router-dom'
 
 const Addproduct = () => {
 const[productname,setProductname] = useState("")
@@ -20,7 +19,7 @@ const submit = async(e) =>{
     const data = new FormData()
     data.append("product_name", productname)
     data.append("product_description",description)
-    data.append("product_cost",cost)
+    data.append("product_cost", cost)
     data.append("product_photo",productphoto)
     // connecting to the flask apis
     const response = await axios.post("http://dumarisper.alwaysdata.net/api/add_product", data)
@@ -52,7 +51,7 @@ const submit = async(e) =>{
             <legend>Description</legend><br />
             <textarea name="" id=""  className='form-control' value={description} onChange={(e) => setDescription (e.target.value)} required></textarea>
             <legend>Cost (ksh)</legend><br />
-            <input type="number" className='form-control'  value={cost} onChange={(e) => setCost(e.target.value)} required/><br />
+            <input type="number" className='form-control'   value={cost}onChange={(e) => setCost(e.target.value.replace("$ ", ""))}required/><br />
             <legend>Product Photo</legend>
             <input type="file" className='form-control'  accept='image/*'  onChange={(e) => setproductphoto(e.target.files[0])} required /><br /><br />
             <button className='btn btn-primary w-100' type='submit'>

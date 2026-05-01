@@ -5,12 +5,12 @@ import Signin from './components/Signin';
 import Addproduct from './components/Addproduct';
 import Getproduct from './components/Getproduct';
 import Makepayment from './components/Makepayment';
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
 import Footer from './components/Footer';
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
     <div className="App">
       <header className="App-header">
         
@@ -35,7 +35,7 @@ function App() {
       <Footer/>
 
     </div>
-    </BrowserRouter>
+    </Router>
   );
 }
 

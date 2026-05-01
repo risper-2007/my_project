@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom'
 
 
 const Makepayment = () => {
-  const {product} = useLocation() .state || {}
+  const {product} = useLocation().state || {}
     const img_url ="http://dumarisper.alwaysdata.net/static/images/"
     const [phone,setPhone] = useState("")
     const[message,setMessage] = useState("")
@@ -23,7 +23,7 @@ const Makepayment = () => {
         data.append("amount", product.product_cost)
         const response = await axios.post ("http://dumarisper.alwaysdata.net/api/mpesa_payment" ,data)
         // update message
-        setMessage("Please complete payment on your phone")
+        setMessage(response.data.message)
     } catch (error) {
        setMessage("")
        setError(error.message) 
