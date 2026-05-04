@@ -14,7 +14,7 @@
 }
 
 .App-header {
-  background-color:rgba(221, 160, 221, 0.795) ;
+  background-color:rgba(160, 219, 221, 0.795) ;
   min-height: 20vh;
   display: flex;
   flex-direction: column;
@@ -38,8 +38,8 @@
 }
 .navlinks{
   margin-right: 10px;
-  background-color: purple;
+  background-color: rgba(14, 71, 146, 0.808);
   padding: 10px;
-  color: black;
+  color: rgb(240, 236, 236);
   text-decoration-color:none;
 }

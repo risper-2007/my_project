@@ -32,7 +32,7 @@ const Getproduct = () => {
 
   return (
     <div className='row '>
-        <h2>𝕬𝖛𝖆𝖎𝖑𝖆𝖇𝖑𝖊 𝕻𝖗𝖔𝖉𝖚𝖈𝖙𝖘</h2><br />
+        <h2>𝕬𝖛𝖆𝖎𝖑𝖆𝖇𝖑𝖊 𝕯𝖊𝖘𝖙𝖎𝖓𝖆𝖙𝖎𝖔𝖓𝖘</h2><br />
         {loading}
         {error}
 
@@ -44,8 +44,8 @@ const Getproduct = () => {
             <div className="card-body">
               <h5>{product.product_name}</h5>
               <p>{product.product_description}</p>
-              <p>{product.product_cost}</p>
-              <button className='btn btn-secondary mt-2 w-100' onClick={()=> navigate('/makepayment',{state: {product}})}>Purchase now</button>
+              <h4 className="text-secondary"> Ksh {product.product_cost} </h4>
+              <button className='btn btn-primary mt-2 w-100 ' onClick={()=> navigate('/makepayment',{state: {product}})}>𝔹𝕠𝕠𝕜 ℕ𝕠𝕨</button>
             </div>
             </div>
           

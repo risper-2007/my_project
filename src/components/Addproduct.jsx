@@ -45,7 +45,7 @@ const submit = async(e) =>{
             {loading}
             {success}
             {error}
-            <h2>𝔸𝕕𝕕 ℙ𝕣𝕠𝕕𝕦𝕔𝕥</h2>
+            <h2>𝔸𝕕𝕕 𝔻𝕖𝕤𝕥𝕚𝕟𝕒𝕥𝕚𝕠𝕟</h2>
             <legend>Product Name</legend><br />
             <input type="text"  className='form-control' value={productname} onChange={(e)=> setProductname(e.target.value)} required /><br />
             <legend>Description</legend><br />
