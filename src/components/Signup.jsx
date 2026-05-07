@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"  // ✅ added useEffect
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import axios from "axios"
 
 const EyeOpen = () => (
@@ -28,6 +28,19 @@ const Signup = () => {
   const [error, setError] = useState("")
   const [focusedField, setFocusedField] = useState(null)
 
+  const location = useLocation()
+  const navigate = useNavigate()
+  const redirectTo = location.state?.redirect || "/"
+  const product = location.state?.product
+
+  // ✅ If user is already logged in, redirect them away from signup
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    if (user) {
+      navigate(redirectTo, { state: { product }, replace: true })
+    }
+  }, [])
+
   const submit = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -42,6 +55,10 @@ const Signup = () => {
       const response = await axios.post("http://dumarisper.alwaysdata.net/api/signup", data)
       setLoading(false)
       setSuccess(response.data.success)
+      localStorage.setItem("user", JSON.stringify({ username, email, phone }))
+      setTimeout(() => {
+        navigate(redirectTo, { state: { product } })
+      }, 1500)
       setUsername("")
       setEmail("")
       setPassword("")
@@ -77,6 +94,9 @@ const Signup = () => {
     color: '#c9a84c',
     marginBottom: '8px',
   }
+
+  // ✅ Render nothing while redirecting (prevents signup form flash)
+  if (localStorage.getItem("user")) return null
 
   return (
     <div style={{
@@ -124,7 +144,9 @@ const Signup = () => {
             letterSpacing: '0.08em',
             margin: 0,
           }}>
-            Begin your journey with us
+            {redirectTo === "/payment"
+              ? "Please create an account to complete your booking"
+              : "Begin your journey with us"}
           </p>
         </div>
 
@@ -137,7 +159,6 @@ const Signup = () => {
           position: 'relative',
           boxShadow: '0 24px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(201,168,76,0.06)',
         }}>
-          {/* Gold corner accents */}
           {[
             { top: -1, left: -1, borderTop: '2px solid #c9a84c', borderLeft: '2px solid #c9a84c' },
             { top: -1, right: -1, borderTop: '2px solid #c9a84c', borderRight: '2px solid #c9a84c' },
@@ -149,7 +170,6 @@ const Signup = () => {
 
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-            {/* Success message */}
             {success && (
               <div style={{
                 background: 'rgba(30,90,50,0.2)',
@@ -161,11 +181,12 @@ const Signup = () => {
                 fontSize: '12px',
                 letterSpacing: '0.04em',
               }}>
-                {success}
+                {redirectTo === "/payment"
+                  ? `${success || "Account created!"} Redirecting you to payment...`
+                  : success}
               </div>
             )}
 
-            {/* Error message */}
             {error && (
               <div style={{
                 background: 'rgba(183,55,55,0.1)',
@@ -184,67 +205,38 @@ const Signup = () => {
             {/* Username */}
             <div>
               <label style={labelStyle}>Username</label>
-              <input
-                type="text"
-                placeholder="Your full name"
-                value={username}
+              <input type="text" placeholder="Your full name" value={username}
                 onChange={e => setUsername(e.target.value)}
-                onFocus={() => setFocusedField('username')}
-                onBlur={() => setFocusedField(null)}
-                required
-                style={inputStyle('username')}
-              />
+                onFocus={() => setFocusedField('username')} onBlur={() => setFocusedField(null)}
+                required style={inputStyle('username')} />
             </div>
 
             {/* Email */}
             <div>
               <label style={labelStyle}>Email Address</label>
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
+              <input type="email" placeholder="your@email.com" value={email}
                 onChange={e => setEmail(e.target.value)}
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField(null)}
-                required
-                style={inputStyle('email')}
-              />
+                onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
+                required style={inputStyle('email')} />
             </div>
 
             {/* Password */}
             <div>
               <label style={labelStyle}>Password</label>
               <div style={{ position: 'relative' }}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Create a password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  onFocus={() => setFocusedField('password')}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  style={{ ...inputStyle('password'), paddingRight: '48px' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                <input type={showPassword ? 'text' : 'password'} placeholder="Create a password"
+                  value={password} onChange={e => setPassword(e.target.value)}
+                  onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)}
+                  required style={{ ...inputStyle('password'), paddingRight: '48px' }} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
                   style={{
-                    position: 'absolute',
-                    right: '14px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: 'rgba(201,168,76,0.5)',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    transition: 'color 0.2s',
+                    position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    color: 'rgba(201,168,76,0.5)', padding: '4px', display: 'flex',
+                    alignItems: 'center', transition: 'color 0.2s',
                   }}
                   onMouseEnter={e => e.currentTarget.style.color = '#c9a84c'}
-                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}
-                >
+                  onMouseLeave={e => e.currentTarget.style.color = 'rgba(201,168,76,0.5)'}>
                   {showPassword ? <EyeClosed /> : <EyeOpen />}
                 </button>
               </div>
@@ -253,52 +245,32 @@ const Signup = () => {
             {/* Phone */}
             <div>
               <label style={labelStyle}>Phone Number</label>
-              <input
-                type="tel"
-                placeholder="+254 700 000 000"
-                value={phone}
+              <input type="tel" placeholder="+254 700 000 000" value={phone}
                 onChange={e => setPhone(e.target.value)}
-                onFocus={() => setFocusedField('phone')}
-                onBlur={() => setFocusedField(null)}
-                required
-                style={inputStyle('phone')}
-              />
+                onFocus={() => setFocusedField('phone')} onBlur={() => setFocusedField(null)}
+                required style={inputStyle('phone')} />
             </div>
 
             {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
+            <button type="submit" disabled={loading}
               style={{
                 marginTop: '8px',
                 background: loading ? 'rgba(201,168,76,0.15)' : 'transparent',
-                border: '1px solid #c9a84c',
-                borderRadius: '2px',
-                padding: '15px',
+                border: '1px solid #c9a84c', borderRadius: '2px', padding: '15px',
                 color: loading ? 'rgba(201,168,76,0.5)' : '#c9a84c',
-                fontFamily: "'Montserrat', sans-serif",
-                fontSize: '11px',
-                fontWeight: 500,
-                letterSpacing: '0.25em',
-                textTransform: 'uppercase',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
+                fontFamily: "'Montserrat', sans-serif", fontSize: '11px', fontWeight: 500,
+                letterSpacing: '0.25em', textTransform: 'uppercase',
+                cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.3s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
               }}
               onMouseEnter={e => { if (!loading) { e.currentTarget.style.background = '#c9a84c'; e.currentTarget.style.color = '#0a0a0a' }}}
-              onMouseLeave={e => { if (!loading) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#c9a84c' }}}
-            >
+              onMouseLeave={e => { if (!loading) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#c9a84c' }}}>
               {loading ? (
                 <>
                   <span style={{
                     width: '14px', height: '14px',
-                    border: '1px solid rgba(201,168,76,0.3)',
-                    borderTopColor: '#c9a84c',
-                    borderRadius: '50%',
-                    display: 'inline-block',
+                    border: '1px solid rgba(201,168,76,0.3)', borderTopColor: '#c9a84c',
+                    borderRadius: '50%', display: 'inline-block',
                     animation: 'spin 0.8s linear infinite',
                   }} />
                   Creating your account...
@@ -310,25 +282,19 @@ const Signup = () => {
 
         {/* Footer link */}
         <p style={{
-          textAlign: 'center',
-          marginTop: '24px',
-          fontFamily: "'Montserrat', sans-serif",
-          fontSize: '12px',
-          color: '#4a4030',
-          letterSpacing: '0.05em',
+          textAlign: 'center', marginTop: '24px',
+          fontFamily: "'Montserrat', sans-serif", fontSize: '12px',
+          color: '#4a4030', letterSpacing: '0.05em',
         }}>
           Already have an account?{' '}
-          <Link to="/signin" style={{
-            color: '#6b521e',
-            textDecoration: 'none',
-            letterSpacing: '0.08em',
-            borderBottom: '1px solid rgba(107,82,30,0.4)',
-            paddingBottom: '1px',
-            transition: 'border-color 0.2s, color 0.2s',
-          }}
+          <Link to="/signin" state={{ redirect: redirectTo, product }}
+            style={{
+              color: '#6b521e', textDecoration: 'none', letterSpacing: '0.08em',
+              borderBottom: '1px solid rgba(107,82,30,0.4)', paddingBottom: '1px',
+              transition: 'border-color 0.2s, color 0.2s',
+            }}
             onMouseEnter={e => { e.currentTarget.style.borderBottomColor = '#6b521e'; e.currentTarget.style.color = '#3d2e0a' }}
-            onMouseLeave={e => { e.currentTarget.style.borderBottomColor = 'rgba(107,82,30,0.4)'; e.currentTarget.style.color = '#6b521e' }}
-          >
+            onMouseLeave={e => { e.currentTarget.style.borderBottomColor = 'rgba(107,82,30,0.4)'; e.currentTarget.style.color = '#6b521e' }}>
             Sign in
           </Link>
         </p>

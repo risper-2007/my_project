@@ -8,29 +8,32 @@ import Getproduct from './components/Getproduct';
 import Makepayment from './components/Makepayment';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import Footer from './components/Footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const AdminRoute = ({ element }) => {
   const user = JSON.parse(localStorage.getItem("user"))
-  const isAdmin = user?.is_admin === true
+  const isAdmin = user?.is_admin == 1 || user?.is_admin === true || user?.is_admin === "true"  // ✅ fixed
   return isAdmin ? element : <Navigate to="/" replace />
 }
 
 const AppContent = () => {
   const location = useLocation()
 
-  // 👇 use state so nav re-renders after login
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")))
-  const isAdmin = user?.is_admin === true
+  const isAdmin = user?.is_admin == 1 || user?.is_admin === true || user?.is_admin === "true"  // ✅ fixed
 
-  // 👇 re-read user from localStorage every time the route changes
-  useState(() => {
+  useEffect(() => {
     setUser(JSON.parse(localStorage.getItem("user")))
   }, [location.pathname])
 
+  const handleLogout = () => {
+    localStorage.removeItem("user")
+    setUser(null)
+  }
+
   const navLinks = [
-    { to: '/signup', label: 'Sign Up' },
-    { to: '/signin', label: 'Sign In' },
+    ...(!user ? [{ to: '/signup', label: 'Sign Up' }] : []),
+    ...(!user ? [{ to: '/signin', label: 'Sign In' }] : []),
     ...(isAdmin ? [{ to: '/addproduct', label: 'Add Destination' }] : []),
     { to: '/', label: 'Destinations' },
   ]
@@ -93,6 +96,7 @@ const AppContent = () => {
         borderBottom: '1px solid rgba(201,168,76,0.15)',
         display: 'flex',
         justifyContent: 'center',
+        alignItems: 'center',
         gap: '8px',
         padding: '0 20px',
       }}>
@@ -131,13 +135,49 @@ const AppContent = () => {
             {label}
           </Link>
         ))}
+
+        {user && (
+          <>
+            <span style={{
+              fontFamily: "'Montserrat', sans-serif",
+              fontSize: '11px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#c9a84c',
+              padding: '16px 20px',
+            }}>
+              {user.username}
+            </span>
+            <button
+              onClick={handleLogout}
+              style={{
+                fontFamily: "'Montserrat', sans-serif",
+                fontSize: '11px',
+                fontWeight: 400,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'rgba(245,240,232,0.55)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '16px 20px',
+                borderBottom: '2px solid transparent',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = '#f5f0e8'}
+              onMouseLeave={e => e.currentTarget.style.color = 'rgba(245,240,232,0.55)'}
+            >
+              Logout
+            </button>
+          </>
+        )}
       </nav>
 
       {location.pathname === '/' && <Mycarousel />}
 
       <Routes>
         <Route path='/signup' element={<Signup />} />
-        <Route path='/signin' element={<Signin />} />
+        <Route path='/signin' element={<Signin onLogin={setUser} />} />
         <Route path='/addproduct' element={<AdminRoute element={<Addproduct />} />} />
         <Route path='/' element={<Getproduct />} />
         <Route path='/makepayment' element={<Makepayment />} />
